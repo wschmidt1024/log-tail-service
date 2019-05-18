@@ -1,0 +1,10 @@
+{
+	"name": "log-tail-service",
+	"version": "0.0.1",
+	"scripts": {},
+	"private": false,
+	"dependencies": {
+		"always-tail": "^0.2.0",
+		"fs": "^0.0.1-security"
+	}
+}
