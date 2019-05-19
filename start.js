@@ -1,3 +1,2 @@
 var logger = require('./src/log-tail-service');
-
-logger.start({});
+logger.start('c:\\HexLogs\\test.txt', 5);
