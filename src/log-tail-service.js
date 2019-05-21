@@ -12,7 +12,7 @@ var LogTailService = (function () {
 			persistent: true
 		});
 		var timer = setTimeout(() => {
-			console.log(`File '${file}' has not been created and this service will no longer watch for its creation.`);
+			console.log(`File '${file}' has not been created within allotted time and this service will no longer watch for its creation.`);
 			watcher.close();
 		}, timeout * 1000);
 		watcher.on('add', watchedFile => {
@@ -29,8 +29,8 @@ var LogTailService = (function () {
 			console.log(data);
 			//TODO: publish data for any subscribers
 		});
-		tail.on('error', function (data) {
-			console.error("error:", data);
+		tail.on('error', function (error) {
+			console.error("error: ", error);
 		});
 		console.log(`Tailing log file: '${file}'`);
 	}
