@@ -5,6 +5,8 @@ const chokidar = require('chokidar');
 const Tail = require('always-tail');
 
 var LogTailService = (function () {
+	var publish;
+
 	function watchForFileCreation(file, timeout) {
 		console.log(`File '${file}' does not exist. Waiting for it to be created...`);
 		const watcher = chokidar.watch(file, {
@@ -26,23 +28,23 @@ var LogTailService = (function () {
 			interval: 100
 		});
 		tail.on('line', function (data) {
-			console.log(data);
-			//TODO: publish data for any subscribers
+			publish(data);
 		});
 		tail.on('error', function (error) {
-			console.error("error: ", error);
+			console.error("File Tail Error: ", error);
 		});
-		console.log(`Tailing log file: '${file}'`);
+		console.log(`Tailing Log File: '${file}'`);
 	}
 
 	return {
-		start: function (file, timeout) {
+		start: function (file, timeout, callback) {
 			if (!file) {
 				console.error('Unable to tail file. Provided file path is empty.');
 				return;
 			}
 			timeout = typeof timeout === 'number' ? timeout : 30;
 			timeout = timeout <= 0 ? 1 : (timeout > 30 ? 30 : timeout);
+			publish = typeof callback === 'function' ? callback : (m) => {};
 
 			if (!fs.existsSync(file)) {
 				var directory = path.dirname(file);
