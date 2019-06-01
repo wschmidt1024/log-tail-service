@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Log Tail Service Application</title>
+	<link rel="stylesheet" type="text/css" href="./css/electron.css">
+</head>
+
+<body>
+	<h1 id="testh1">test</h1>
+	<button id="browse">Browse for File</button>
+	<select id="mode">
+		<option value="openFile">File</option>
+		<option value="openDirectory">Directory</option>
+	</select>
+	<input id="file" type="text" />
+	<button id="start">Start</button>
+	<script type="text/javascript">
+		const { ipcRenderer } = require('electron');
+		ipcRenderer.on('folderData', (event, data) => {
+			console.log(data);
+		});
+
+		document.addEventListener('DOMContentLoaded', () => {
+			getModeSelectElement().addEventListener('change', () => {
+				toggleFileNameInput();
+				setBrowseButtonText();
+			});
+			getBrowseButtonElement().addEventListener('click', event => {
+				event.preventDefault();
+				openFile();
+			});
+			getStartButtonElement().addEventListener('click', event => {
+				event.preventDefault();
+
+				// TODO: finish moving these variables to the UI
+				var topic = 'test-topic';
+				var port = 4000;
+				var file = 'c:\\HexLogs\\test.txt';
+				var timeout = 30;
+				// TODO: finish moving these variables to the UI
+
+				var publisher = require('./src/socket-io-push');
+				publisher.init(port, topic);
+				var logger = require('./src/log-tail-service');
+				logger.start(file, timeout, publisher.publish);
+
+				console.log('start tailing file');
+			});
+		});
+
+		function setBrowseButtonText() {
+			switch (getSelectedMode()) {
+				case 'openDirectory':
+					setBrowseButtonTextToValue('Browse for Directory');
+					break;
+				case 'openFile':
+				default:
+					setBrowseButtonTextToValue('Browse for File');
+					break;
+			}
+		}
+		function toggleFileNameInput() {
+			switch (getSelectedMode()) {
+				case 'openDirectory':
+					showFileNameInput();
+					break;
+				case 'openFile':
+				default:
+					hideFileNameInput();
+					break;
+			}
+		}
+		function openFile() {
+			ipcRenderer.send('openFolder', () => { }, getSelectedMode());
+		}
+
+		function getSelectedMode() {
+			var element = getModeSelectElement();
+			return element != null ? element.options[element.selectedIndex].value : null;
+		}
+		function setBrowseButtonTextToValue(text) {
+			getBrowseButtonElement().innerText = text;
+		}
+		function hideFileNameInput() {
+			getFileInputElement().style.visibility = 'hidden';
+		}
+		function showFileNameInput() {
+			getFileInputElement().style.visibility = 'visible';
+		}
+
+		function getFileInputElement() {
+			var input = document.getElementById('file');
+			return input;
+		}
+		function getModeSelectElement() {
+			return document.getElementById('mode');
+		}
+		function getBrowseButtonElement() {
+			return document.getElementById('browse');
+		}
+		function getStartButtonElement() {
+			return document.getElementById('start');
+		}
+	</script>
+</body>
+
+</html>

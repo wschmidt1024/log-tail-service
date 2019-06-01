@@ -4,6 +4,8 @@ Node.js module that tails a specified log file. Updates to the log file are publ
 
 ## Usage
 
+### Using As a Module
+
 First, create a publisher that broadcasts updates from the log file.
 
 ```js
@@ -28,6 +30,20 @@ logger.start(path, timeout, callback);
 
 `callback` - The function used to publish the log update for subscribers. This function takes a single parameter, which is the text update from the log file. Use the function defined by the publisher.
 
+### Using start.js
+
+You may use the start.js file to tail a file with this project. Just change the settings in the logger.start code in the start.js file and run this command in you terminal:
+
+`node start`
+
+### Using the Electron Application
+
+You may also start this service using the Electron application using the command, `npm start`. This provides a UI for changing settings and starting the service.
+
+### Using the subscriber.html file
+
+Run this HTML file in a browser to verify that the messages can be received and processed by a subscriber.
+
 ## Example
 
 ```js
@@ -46,3 +62,5 @@ This module uses the following Node.js modules:
 `chokidar` - Used to watch for log file creation when it does not yet exist.
 
 `socket.io` - Used to publish to subscribers.
+
+`electron.js` - Used to create Electron application.
