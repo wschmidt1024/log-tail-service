@@ -5,7 +5,7 @@ const chokidar = require('chokidar');
 const Tail = require('always-tail');
 
 var LogTailService = (function () {
-	var publish;
+	// var publish;
 
 	function watchForFileCreation(file, timeout) {
 		console.log(`File '${file}' does not exist. Waiting for it to be created...`);
@@ -23,12 +23,15 @@ var LogTailService = (function () {
 		});
 	}
 
-	function tailFile(file) {
+	function tailFile(file, callback) {
 		var tail = new Tail(file, os.EOL, {
 			interval: 100
 		});
 		tail.on('line', function (data) {
-			publish(data);
+			// publish(data);
+			if (typeof callback === 'function') {
+				callback(data);
+			}
 		});
 		tail.on('error', function (error) {
 			console.error("File Tail Error: ", error);
@@ -39,12 +42,12 @@ var LogTailService = (function () {
 	return {
 		start: function (file, timeout, callback) {
 			if (!file) {
-				console.error('Unable to tail file. Provided file path is empty.');
+				console.error('Unable to tail file. Provided file path is undefined, null, or empty.');
 				return;
 			}
 			timeout = typeof timeout === 'number' ? timeout : 30;
 			timeout = timeout <= 0 ? 1 : (timeout > 30 ? 30 : timeout);
-			publish = typeof callback === 'function' ? callback : (m) => {};
+			// publish = typeof callback === 'function' ? callback : (m) => {};
 
 			if (!fs.existsSync(file)) {
 				var directory = path.dirname(file);
@@ -55,7 +58,7 @@ var LogTailService = (function () {
 					watchForFileCreation(file, timeout);
 				}
 			} else {
-				tailFile(file);
+				tailFile(file, callback);
 			}
 		}
 	};
